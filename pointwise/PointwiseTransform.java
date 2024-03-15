@@ -50,8 +50,17 @@ public class PointwiseTransform extends Object {
 		int nx = input.getWidth();
 		int ny = input.getHeight();
 		ImageAccess output = new ImageAccess(nx, ny);
-		// Add your code here
-		return output;
+		
+		for (int i = 0; i < nx; i++) {
+			for (int j = 0; j < ny; j++) {
+				double pixel = input.getPixel(i, j);
+				double newValue = Math.min(pixel, 10000.0);
+
+				output.putPixel(i, j, newValue);
+			}
+		}
+
+		return rescale(output);
 	}
 	
 	/**
