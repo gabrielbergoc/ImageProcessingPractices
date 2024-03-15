@@ -27,8 +27,20 @@ public class PointwiseTransform extends Object {
 		double max = input.getMaximum();
 		double min = input.getMinimum();
 		ImageAccess output = new ImageAccess(nx, ny);
-		// Add your code here
-		return output;	
+		
+		double alpha = 255 / (max - min);
+		double beta = min;
+
+		for (int i = 0; i < nx; i++) {
+			for (int j = 0; j < ny; j++) {
+				double pixel = input.getPixel(i, j);
+				double newPixel = alpha * (pixel - beta);
+
+				output.putPixel(i, j, newPixel);
+			}
+		}
+
+		return output;
 	}
 
 	/**
