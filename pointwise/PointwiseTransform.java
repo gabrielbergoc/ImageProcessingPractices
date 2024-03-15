@@ -97,7 +97,21 @@ public class PointwiseTransform extends Object {
 		int ny = zstack[0].getHeight();
 		int nz = zstack.length;
 		ImageAccess output = new ImageAccess(nx, ny);
-		// Add your code here
+		
+		for (int i = 0; i < nx; i++) {
+			for (int j = 0; j < ny; j++) {
+				double sum = 0;
+				
+				for (int k = 0; k < nz; k++) {
+					double pixel = zstack[k].getPixel(i, j);
+
+					sum += pixel;
+				}
+
+				output.putPixel(i, j, sum / nz);
+			}
+		}
+
 		return output;	
 	}
 
