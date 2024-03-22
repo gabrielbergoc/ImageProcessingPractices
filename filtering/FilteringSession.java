@@ -83,8 +83,22 @@ public class FilteringSession {
 	}
 
 	static public ImageAccess detectEdgeHorizontal_NonSeparable(ImageAccess input) {
-		IJ.showMessage("Question 1");
-		return input.duplicate();
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+		double arr[][] = new double[3][3];
+		double pixel;
+		ImageAccess out = new ImageAccess(nx, ny);
+
+		for (int x = 0; x < nx; x++) {
+			for (int y = 0; y < ny; y++) {
+				input.getNeighborhood(x, y, arr);
+				pixel = arr[0][2] + arr[1][2] + arr[2][2] -
+						arr[0][0] - arr[1][0] - arr[2][0];
+				pixel = pixel / 6.0;
+				out.putPixel(x, y, pixel);
+			}
+		}
+		return out;
 	}
 
 	static public ImageAccess detectEdgeHorizontal_Separable(ImageAccess input) {
