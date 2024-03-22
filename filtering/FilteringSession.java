@@ -102,8 +102,26 @@ public class FilteringSession {
 	}
 
 	static public ImageAccess detectEdgeHorizontal_Separable(ImageAccess input) {
-		IJ.showMessage("Question 1");
-		return input.duplicate();
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+		ImageAccess out = new ImageAccess(nx, ny);
+		double colIn[]  = new double[ny];
+		double colOut[] = new double[ny];
+		for (int x = 0; x < nx; x++) {
+			input.getColumn(x, colIn);
+			doDifference3(colIn, colOut);
+			out.putColumn(x, colOut);
+		}
+		
+		double rowIn[]  = new double[nx];
+		double rowOut[] = new double[nx];
+		for (int y = 0; y < ny; y++) {
+			out.getRow(y, rowIn);
+			doAverage3(rowIn, rowOut);
+			out.putRow(y, rowOut);
+		}
+
+		return out;
 	}
 
 	/**
