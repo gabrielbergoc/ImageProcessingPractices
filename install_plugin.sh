@@ -6,5 +6,8 @@ if [ -z "$1" ]
     exit 1
 fi
 
-#rm -rf ~/.imagej/plugins/$1
-cp -r ~/Documentos/Processamento\ de\ Imagens/code/praticas/$1 ~/.imagej/plugins/
+# LAB
+# cp -r ~/Documentos/Processamento\ de\ Imagens/code/praticas/$1 ~/.imagej/plugins/
+
+# HOME
+cp -r "$PWD/$1" /c/ImageJ/plugins/
