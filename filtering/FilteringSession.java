@@ -186,8 +186,38 @@ public class FilteringSession {
 	}
 
 	static public ImageAccess doMovingAverage5_Separable(ImageAccess input) {
-		IJ.showMessage("Question 2");
-		return input.duplicate();
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+		ImageAccess out = new ImageAccess(nx, ny);
+		double rowin[]  = new double[nx];
+		double rowout[] = new double[nx];
+
+		for (int y = 0; y < ny; y++) {
+			input.getRow(y, rowin);
+			doAverage5(rowin, rowout);
+			out.putRow(y, rowout);
+		}
+		
+		double colin[]  = new double[ny];
+		double colout[] = new double[ny];
+		for (int x = 0; x < nx; x++) {
+			out.getColumn(x, colin);
+			doAverage5(colin, colout);
+			out.putColumn(x, colout);
+		}
+		return out;
+	}
+
+	static private void doAverage5(double vin[], double vout[]) {
+		int n = vin.length;
+		
+		vout[0] = (2*vin[0] + 2*vin[1] + vin[2]) / 5;
+		vout[1] = (2*vin[0] + vin[1] + vin[2] + vin[3]) / 5;
+		for (int i = 2; i < n - 2; i++) {
+			vout[i] = (vin[i - 2] + vin[i - 1] + vin[i] + vin[i + 1] + vin[i + 2]) / 5;
+		}
+		vout[n - 2] = (vin[n - 4] + vin[n - 3] + vin[n - 2] + 2*vin[n - 1]) / 5;
+		vout[n - 1] = (vin[n - 3] + 2*vin[n - 2] + 2*vin[n - 1]) / 5;
 	}
 
 	static public ImageAccess doMovingAverage5_Recursive(ImageAccess input) {
