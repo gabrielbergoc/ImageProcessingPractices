@@ -161,8 +161,28 @@ public class FilteringSession {
 	 ******************************************************************************/
 
 	static public ImageAccess doMovingAverage5_NonSeparable(ImageAccess input) {
-		IJ.showMessage("Question 2");
-		return input.duplicate();
+		int maskWidth = 5;
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+		double arr[][] = new double[maskWidth][maskWidth];
+		double pixel;
+		ImageAccess out = new ImageAccess(nx, ny);
+
+		for (int x = 0; x < nx; x++) {
+			for (int y = 0; y < ny; y++) {
+				input.getNeighborhood(x, y, arr);
+				pixel = 0;
+				
+				for (int i = 0; i < maskWidth; i++)
+					for (int j = 0; j < maskWidth; j++)
+						pixel += arr[i][j];
+				
+				pixel = pixel / (maskWidth * maskWidth);
+
+				out.putPixel(x, y, pixel);
+			}
+		}
+		return out;
 	}
 
 	static public ImageAccess doMovingAverage5_Separable(ImageAccess input) {
