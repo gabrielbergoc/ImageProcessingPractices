@@ -1,3 +1,4 @@
+import java.util.function.BiConsumer;
 import ij.*;
 
 public class FilteringSession {
@@ -191,10 +192,11 @@ public class FilteringSession {
 		ImageAccess out = new ImageAccess(nx, ny);
 		double rowin[]  = new double[nx];
 		double rowout[] = new double[nx];
+		BiConsumer<double[], double[]> doAverage5 = doAverage(5);
 
 		for (int y = 0; y < ny; y++) {
 			input.getRow(y, rowin);
-			doAverage5(rowin, rowout);
+			doAverage5.accept(rowin, rowout);
 			out.putRow(y, rowout);
 		}
 		
@@ -202,7 +204,7 @@ public class FilteringSession {
 		double colout[] = new double[ny];
 		for (int x = 0; x < nx; x++) {
 			out.getColumn(x, colin);
-			doAverage5(colin, colout);
+			doAverage5.accept(colin, colout);
 			out.putColumn(x, colout);
 		}
 		return out;
@@ -218,6 +220,28 @@ public class FilteringSession {
 		}
 		vout[n - 2] = (vin[n - 4] + vin[n - 3] + vin[n - 2] + 2*vin[n - 1]) / 5;
 		vout[n - 1] = (vin[n - 3] + 2*vin[n - 2] + 2*vin[n - 1]) / 5;
+	}
+
+	static private BiConsumer<double[], double[]> doAverage(int width) {
+		return (vin, vout) -> {
+			int n = vin.length;
+			
+			for (int i = 0; i < n; i++) {
+				vout[i] = 0;
+
+				for (int j = -width/2; j < width/2; j++) {
+					int nReflections = Math.abs((i + j) / n) + (i + j < 0 ? 1 : 0);
+					int nSteps = Math.abs((i + j) % n);
+					int initialDirection = i + j < 0 ? -1 : i + j >= n ? 1 : 0;
+					int stepsDirection = (int)Math.pow(-1, (double)nReflections) * initialDirection;
+					int k = stepsDirection == -1 ? n - (1 + nSteps ) : stepsDirection == 1 ? nSteps - 1 : nSteps;
+
+					vout[i] += vin[k];
+				}
+
+				vout[i] /= (double)width;
+			}
+		};
 	}
 
 	static public ImageAccess doMovingAverage5_Recursive(ImageAccess input) {
