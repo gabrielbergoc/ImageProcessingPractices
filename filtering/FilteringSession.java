@@ -232,8 +232,65 @@ public class FilteringSession {
 	 ******************************************************************************/
 
 	static public ImageAccess doSobel(ImageAccess input) {
-		IJ.showMessage("Question 4");
-		return input.duplicate();
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+
+		double[] sobelx = { 1, 2, 1 };
+		double[] sobely = { -1, 0, 1 };
+
+		ImageAccess outx = convolveSeparable(input, sobelx, sobely);
+		outx.show("resultado de Gx");
+		ImageAccess outy = convolveSeparable(input, sobely, sobelx);
+		outy.show("resultado de Gy");
+		ImageAccess out = new ImageAccess(nx, ny);
+
+		for (int i = 0; i < nx; i++) {
+			for (int j = 0; j < ny; j++) {
+				double x = outx.getPixel(i, j);
+				double y = outy.getPixel(i, j);
+				double result = Math.sqrt(x * x + y * y);
+
+				out.putPixel(i, j, result);
+			}
+		}
+
+		return out;
+	}
+
+	static public ImageAccess convolveSeparable(ImageAccess input, double[] kernelx, double[] kernely) {
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+		double rowin[]  = new double[nx];
+		double rowout[] = new double[nx];
+		double colin[]  = new double[ny];
+		double colout[] = new double[ny];
+		ImageAccess out = new ImageAccess(nx, ny);
+
+		for (int y = 0; y < ny; y++) {
+			input.getRow(y, rowin);
+			convolve1DKernel(rowin, rowout, kernely);
+			out.putRow(y, rowout);
+		}
+
+		for (int x = 0; x < nx; x++) {
+			out.getColumn(x, colin);
+			convolve1DKernel(colin, colout, kernelx);
+			out.putColumn(x, colout);
+		}
+
+		return out;
+	}
+
+	static public void convolve1DKernel(double[] vin, double[] vout, double[] kernel) {
+		int n = vin.length;
+
+		vout[0] = kernel[0]*vin[0] + kernel[1]*vin[0] + kernel[2]*vin[1];
+		
+		for (int i = 1; i < n-1; i++) {
+			vout[i] = kernel[0]*vin[i-1] + kernel[1]*vin[i] + kernel[2]*vin[i+1];
+		}
+		
+		vout[n-1] = kernel[0]*vin[n-2] + kernel[1]*vin[n-1] + kernel[2]*vin[n-1];
 	}
 
 
