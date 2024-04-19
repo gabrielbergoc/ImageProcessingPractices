@@ -7,7 +7,7 @@ if [ -z "$1" ]
 fi
 
 # LAB
-# cp -r ~/Documentos/Processamento\ de\ Imagens/code/praticas/$1 ~/.imagej/plugins/
+cp -r ~/Documentos/Processamento\ de\ Imagens/code/praticas/$1 ~/.imagej/plugins/
 
 # HOME
-cp -r "$PWD/$1" /c/ImageJ/plugins/
+# cp -r "$PWD/$1" /c/ImageJ/plugins/

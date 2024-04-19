@@ -31,18 +31,32 @@ public class Morpho8 {
 	}
 
 	static public ImageAccess doErosion(ImageAccess img) {
-		IJ.showMessage("Question");
-		return img;
+		int nx = img.getWidth();
+		int ny = img.getHeight();
+		ImageAccess out = new ImageAccess(nx, ny);
+		double arr[] = new double[9];
+		double min;
+		
+		for (int x=0; x<nx; x++) 
+		for (int y=0; y<ny; y++) {
+			img.getPattern(x, y, arr, ImageAccess.PATTERN_SQUARE_3x3);
+			min = arr[0];
+			for (int k=1; k<9; k++) {
+				if (arr[k] < min) {
+					min = arr[k];
+				}
+			}
+			out.putPixel(x, y, min);
+		}
+		return out;
 	}
 
 	static public ImageAccess doOpen(ImageAccess img) {
-		IJ.showMessage("Question");
-		return img;
+		return doDilation(doErosion(img));
 	}
 
 	static public ImageAccess doClose(ImageAccess img) {
-		IJ.showMessage("Question");
-		return img;
+		return doErosion(doDilation(img));
 	}
 
 	static public ImageAccess doGradient(ImageAccess img) {
