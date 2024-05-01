@@ -23,7 +23,7 @@ public class IdealLowPass_ extends PlugInFrame implements ActionListener {
 			return;
 		}
 		instance = this;
-		IJ.register(LowPass_.class);
+		IJ.register(IdealLowPass_.class);
 
 		setLayout(new FlowLayout());
 		panel = new Panel();
@@ -49,7 +49,7 @@ public class IdealLowPass_ extends PlugInFrame implements ActionListener {
 		String label = e.getActionCommand();
 		if (label==null)
 			return;
-		new IdealRunner(label);
+		new IdealLowPassRunner(label);
 	}
 
 	public void processWindowEvent(WindowEvent e) {
@@ -61,12 +61,12 @@ public class IdealLowPass_ extends PlugInFrame implements ActionListener {
 
 }
 
-class IdealRunner extends Thread {
+class IdealLowPassRunner extends Thread {
 	private String command;
 	private ImagePlus imp;
 	private ImageProcessor ip;
 
-	IdealRunner(String command) {
+	IdealLowPassRunner(String command) {
 		super(command);
 		this.command = command;
 		this.imp = imp;

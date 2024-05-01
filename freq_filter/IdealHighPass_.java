@@ -8,8 +8,8 @@ import ij.process.*;
 import ij.gui.*;
 
 /**
-	IdealHighPass_.java.
-*/
+ * IdealHighPass_.java.
+ */
 public class IdealHighPass_ extends PlugInFrame implements ActionListener {
 
 	Panel panel;
@@ -18,12 +18,12 @@ public class IdealHighPass_ extends PlugInFrame implements ActionListener {
 
 	public IdealHighPass_() {
 		super("Ideal LowPass");
-		if (instance!=null) {
+		if (instance != null) {
 			instance.toFront();
 			return;
 		}
 		instance = this;
-		IJ.register(LowPass_.class);
+		IJ.register(IdealLowPass_.class);
 
 		setLayout(new FlowLayout());
 		panel = new Panel();
@@ -33,12 +33,12 @@ public class IdealHighPass_ extends PlugInFrame implements ActionListener {
 		addButton("PI/8");
 		addButton("PI/16");
 		add(panel);
-		
+
 		pack();
 		GUI.center(this);
 		show();
 	}
-	
+
 	void addButton(String label) {
 		Button b = new Button(label);
 		b.addActionListener(this);
@@ -47,46 +47,49 @@ public class IdealHighPass_ extends PlugInFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		String label = e.getActionCommand();
-		if (label==null)
+		if (label == null)
 			return;
-		new IdealRunner(label);
+		new IdealHighPassRunner(label);
 	}
 
 	public void processWindowEvent(WindowEvent e) {
 		super.processWindowEvent(e);
-		if (e.getID()==WindowEvent.WINDOW_CLOSING) {
-			instance = null;	
+		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+			instance = null;
 		}
 	}
 
 }
 
-class IdealRunner extends Thread {
+class IdealHighPassRunner extends Thread {
 	private String command;
 	private ImagePlus imp;
 	private ImageProcessor ip;
 
-	IdealRunner(String command) {
+	IdealHighPassRunner(String command) {
 		super(command);
 		this.command = command;
 		this.imp = imp;
 		this.ip = ip;
-		setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
+		setPriority(Math.max(getPriority() - 2, MIN_PRIORITY));
 		start();
 	}
 
 	public void run() {
-		try {runCommand(command);}
-		catch(OutOfMemoryError e) {
+		try {
+			runCommand(command);
+		} catch (OutOfMemoryError e) {
 			IJ.outOfMemory(command);
-			if (imp!=null) imp.unlock();
-		} catch(Exception e) {
+			if (imp != null)
+				imp.unlock();
+		} catch (Exception e) {
 			CharArrayWriter caw = new CharArrayWriter();
 			PrintWriter pw = new PrintWriter(caw);
 			e.printStackTrace(pw);
 			IJ.write(caw.toString());
 			IJ.showStatus("");
-			if (imp!=null) imp.unlock();
+			if (imp != null)
+				imp.unlock();
 		}
 	}
 
@@ -96,18 +99,27 @@ class IdealRunner extends Thread {
 		double f;
 		ImageAccess im;
 		IJ.showStatus(command + "...");
-		im=new ImageAccess(256,256);
+		im = new ImageAccess(256, 256);
 		if (command.equals("PI/16"))
-			radius=16;
+			radius = 16;
 		if (command.equals("PI/8"))
-			radius=32;
+			radius = 32;
 		if (command.equals("PI/4"))
-			radius=64;
+			radius = 64;
 		if (command.equals("PI/2"))
-			radius=128;
-//
-//		design the filter here
-//
-		im.show("Ideal High Pass "+command);
+			radius = 128;
+
+		for (i = 0; i < 256; i++) {
+			for (j = 0; j < 256; j++) {
+				r = (int) Math.round(Math.sqrt(Math.pow((double) i - 128, 2) + Math.pow((double) j - 128, 2)));
+				if (r >= radius) {
+					im.putPixel(i, j, 1);
+				} else {
+					im.putPixel(i, j, 0);
+				}
+			}
+		}
+
+		im.show("Ideal High Pass " + command);
 	}
 }
