@@ -1,3 +1,4 @@
+import java.util.function.BiConsumer;
 import ij.*;
 
 public class FilteringSession {
