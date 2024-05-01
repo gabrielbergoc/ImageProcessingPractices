@@ -3,30 +3,31 @@ import ij.*;
 public class Morpho8 {
 
 	/**
-	* Implements "dilation" method for 8-connected pixels of an ImageAccess object.
-	* For each pixel, the maximum value of the gray levels of its 3x3 local neighborhood
-	* which is 8-connected is found.
-	*
-	* @param img       	an ImageAccess object
-	*/
+	 * Implements "dilation" method for 8-connected pixels of an ImageAccess object.
+	 * For each pixel, the maximum value of the gray levels of its 3x3 local
+	 * neighborhood
+	 * which is 8-connected is found.
+	 *
+	 * @param img an ImageAccess object
+	 */
 	static public ImageAccess doDilation(ImageAccess img) {
 		int nx = img.getWidth();
 		int ny = img.getHeight();
 		ImageAccess out = new ImageAccess(nx, ny);
 		double arr[] = new double[9];
 		double max;
-		
-		for (int x=0; x<nx; x++) 
-		for (int y=0; y<ny; y++) {
-			img.getPattern(x, y, arr, ImageAccess.PATTERN_SQUARE_3x3);
-			max = arr[0];
-			for (int k=1; k<9; k++) {
-				if (arr[k] > max) {
-					max = arr[k];
+
+		for (int x = 0; x < nx; x++)
+			for (int y = 0; y < ny; y++) {
+				img.getPattern(x, y, arr, ImageAccess.PATTERN_SQUARE_3x3);
+				max = arr[0];
+				for (int k = 1; k < 9; k++) {
+					if (arr[k] > max) {
+						max = arr[k];
+					}
 				}
+				out.putPixel(x, y, max);
 			}
-			out.putPixel(x, y, max);
-		}
 		return out;
 	}
 
@@ -36,18 +37,18 @@ public class Morpho8 {
 		ImageAccess out = new ImageAccess(nx, ny);
 		double arr[] = new double[9];
 		double min;
-		
-		for (int x=0; x<nx; x++) 
-		for (int y=0; y<ny; y++) {
-			img.getPattern(x, y, arr, ImageAccess.PATTERN_SQUARE_3x3);
-			min = arr[0];
-			for (int k=1; k<9; k++) {
-				if (arr[k] < min) {
-					min = arr[k];
+
+		for (int x = 0; x < nx; x++)
+			for (int y = 0; y < ny; y++) {
+				img.getPattern(x, y, arr, ImageAccess.PATTERN_SQUARE_3x3);
+				min = arr[0];
+				for (int k = 1; k < 9; k++) {
+					if (arr[k] < min) {
+						min = arr[k];
+					}
 				}
+				out.putPixel(x, y, min);
 			}
-			out.putPixel(x, y, min);
-		}
 		return out;
 	}
 
@@ -65,36 +66,50 @@ public class Morpho8 {
 	}
 
 	static public ImageAccess doTopHatBright(ImageAccess img) {
-		IJ.showMessage("Question");
-		return img;
+		ImageAccess out = doOpen(img);
+		out.subtract(img, out);
+		return out;
 	}
 
 	static public ImageAccess doTopHatDark(ImageAccess img) {
-		IJ.showMessage("Question");
-		return img;
+		ImageAccess out = doClose(img);
+		out.subtract(img, out);
+		return out;
 	}
 
 	static public ImageAccess doMedian(ImageAccess img) {
-		IJ.showMessage("Question");
-		return img;
+		int nx = img.getWidth();
+		int ny = img.getHeight();
+		double arr[] = new double[9];
+		ImageAccess out = new ImageAccess(nx, ny);
+
+		for (int x = 0; x < nx; x++) {
+			for (int y = 0; y < ny; y++) {
+				img.getPattern(x, y, arr, ImageAccess.PATTERN_SQUARE_3x3);
+				sortArray(arr);
+				out.putPixel(x, y, arr[4]);
+			}
+		}
+
+		return out;
 	}
 
 	/**
-	* Implements an algorithm for sorting arrays.
-	* Result is returned by the same array used as input.
-	*
-	* @param array       input and output array of the type double
-	*/
+	 * Implements an algorithm for sorting arrays.
+	 * Result is returned by the same array used as input.
+	 *
+	 * @param array input and output array of the type double
+	 */
 	static private void sortArray(double array[]) {
 		int len = array.length;
 		int l, k, lmin;
 		double permute, min;
-		
+
 		for (k = 0; k < len - 1; k++) {
 			min = array[k];
 			lmin = k;
 			for (l = k + 1; l < len; l++) {
-				if (array[l] < min) { 
+				if (array[l] < min) {
 					min = array[l];
 					lmin = l;
 				}
