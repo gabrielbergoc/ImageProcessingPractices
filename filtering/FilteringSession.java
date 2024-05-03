@@ -306,4 +306,49 @@ public class FilteringSession {
 		return input.duplicate();
 	}
 
+	static public ImageAccess gaussianFilter(ImageAccess input, int width, double sigma) {
+		int nx = input.getWidth();
+		int ny = input.getHeight();
+		ImageAccess out = new ImageAccess(nx, ny);
+		double[][] arr = new double[width][width];
+		double[][] kernel = makeGaussianKernel(width, sigma);
+
+		for (int x = 0; x < nx; x++) {
+			for (int y = 0; y < ny; y++) {
+				input.getNeighborhood(x, y, arr);
+				double pixel = 0;
+
+				for (int i = 0; i < width; i++) {
+					for (int j = 0; j < width; j++) {
+						pixel += arr[i][j] * kernel[i][j];
+					}
+				}
+
+				out.putPixel(x, y, pixel);
+			}
+		}
+
+		return out;
+	}
+
+	/**
+	 * Returns a square gaussian kernel. `width` must be odd.
+	 * @param width
+	 * @param sigma
+	 * @return square gaussian kernel
+	 */
+	static public double[][] makeGaussianKernel(int width, double sigma) {
+		double[][] kernel = new double[width][width];
+		int center = width/2;
+
+		for (int x = -center; x <= center; x++) {
+			for (int y = -center; y <= center; y++) {
+				int i = x + center;
+				int j = y + center;
+				kernel[i][j] = Math.exp(-(x*x + y*y)/(2*sigma*sigma));
+			}
+		}
+
+		return kernel;
+	}
 }
